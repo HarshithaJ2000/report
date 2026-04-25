@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BorrowBox — QR Inventory Tracking System | IS 5960 MRP</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --ink:    #0a0a0a;
+  --chalk:  #f5f2ec;
+  --paper:  #faf9f6;
+  --rust:   #c0392b;
+  --amber:  #d4a017;
+  --moss:   #2d5016;
+  --steel:  #1a2744;
+  --mist:   #e8e4da;
+  --rule:   rgba(10,10,10,0.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); overflow-x: hidden; }
+
+/* ── NAV ───────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3rem; height: 56px;
+  background: var(--ink); backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: #fff; letter-spacing: 2px; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: rgba(255,255,255,0.55); font-size: .8rem; text-decoration: none; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: #fff; }
+.nav-cta { background: #fff; color: var(--ink); padding: .4rem 1.2rem; border-radius: 2px; font-size: .8rem; font-weight: 600; text-decoration: none; letter-spacing: .05em; }
+
+/* ── HERO ──────────────────────────────────────────────────── */
+#hero {
+  min-height: 100vh; display: grid; grid-template-rows: 1fr auto;
+  background: var(--ink); position: relative; overflow: hidden;
+  padding-top: 56px;
+}
+.hero-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 5rem 3rem 3rem; gap: 4rem; }
+.hero-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: rgba(255,255,255,.4); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 1.5rem; }
+.hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 7vw, 7rem); color: #fff; line-height: .9; letter-spacing: 1px; }
+.hero-title span { color: var(--amber); display: block; }
+.hero-sub { color: rgba(255,255,255,.55); font-size: 1.1rem; line-height: 1.6; margin-top: 1.5rem; max-width: 480px; }
+.hero-actions { display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; }
+.btn-primary { background: #fff; color: var(--ink); padding: .8rem 2rem; font-weight: 600; text-decoration: none; font-size: .9rem; border-radius: 2px; transition: opacity .2s; letter-spacing: .02em; }
+.btn-outline { border: 1px solid rgba(255,255,255,.3); color: #fff; padding: .8rem 2rem; font-size: .9rem; text-decoration: none; border-radius: 2px; transition: all .2s; letter-spacing: .02em; }
+.btn-outline:hover { background: rgba(255,255,255,.08); }
+
+/* Stat cards on hero right */
+.hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; }
+.stat-card { padding: 1.8rem 1.5rem; background: #0f0f0f; }
+.stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: #fff; line-height: 1; }
+.stat-val.bad { color: var(--rust); }
+.stat-val.good { color: #5cba47; }
+.stat-lbl { font-size: .75rem; color: rgba(255,255,255,.4); margin-top: .3rem; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }
+.stat-arrow { font-size: .7rem; margin-top: .5rem; }
+.stat-arrow.down { color: #5cba47; }
+.stat-arrow.up { color: var(--rust); }
+
+/* Hero footer bar */
+.hero-bar {
+  display: flex; align-items: center; gap: 3rem; padding: 1.2rem 3rem;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.hero-bar-item { font-size: .75rem; color: rgba(255,255,255,.35); letter-spacing: .08em; text-transform: uppercase; }
+.hero-bar-item strong { color: rgba(255,255,255,.7); font-weight: 600; display: block; font-size: .9rem; letter-spacing: 0; text-transform: none; }
+
+/* ── SECTION BASICS ────────────────────────────────────────── */
+section { padding: 6rem 3rem; }
+.section-label { font-family: 'JetBrains Mono', monospace; font-size: .7rem; letter-spacing: .25em; text-transform: uppercase; color: rgba(10,10,10,.4); margin-bottom: .8rem; }
+.section-title { font-family: 'DM Serif Display', serif; font-size: clamp(2.2rem, 4vw, 3.5rem); line-height: 1.1; margin-bottom: 1.5rem; }
+.section-body { font-size: 1rem; line-height: 1.8; color: rgba(10,10,10,.7); max-width: 65ch; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; }
+
+/* ── PROBLEM ───────────────────────────────────────────────── */
+#problem { background: var(--chalk); }
+.problem-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+.problem-card { background: #fff; padding: 2rem; border-left: 3px solid var(--ink); }
+.problem-num { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: var(--rust); line-height: 1; }
+.problem-unit { font-size: .8rem; color: rgba(10,10,10,.5); margin-top: .2rem; letter-spacing: .05em; text-transform: uppercase; }
+.problem-title { font-weight: 600; font-size: 1rem; margin-top: 1rem; margin-bottom: .5rem; }
+.problem-desc { font-size: .9rem; color: rgba(10,10,10,.6); line-height: 1.6; }
+.impact-bar { background: var(--ink); color: #fff; padding: 2rem 3rem; margin-top: 3rem; display: flex; align-items: center; gap: 4rem; }
+.impact-bar-text { font-size: 1.1rem; flex: 1; }
+.impact-bar-text strong { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; display: block; color: var(--amber); }
+.stakeholder-pills { display: flex; gap: .8rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.pill { background: var(--ink); color: #fff; padding: .4rem 1rem; font-size: .8rem; border-radius: 2px; font-weight: 500; }
+
+/* ── DATA ──────────────────────────────────────────────────── */
+#data { background: var(--paper); }
+.dataset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2.5rem; }
+.dataset-block { border: 1px solid var(--rule); padding: 2rem; background: #fff; }
+.dataset-block h3 { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+.dataset-label { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: rgba(10,10,10,.4); text-transform: uppercase; letter-spacing: .12em; margin-bottom: .8rem; }
+.rule-list { list-style: none; margin-top: 1rem; }
+.rule-list li { font-size: .87rem; color: rgba(10,10,10,.65); line-height: 1.7; padding-left: 1.2rem; position: relative; }
+.rule-list li::before { content: '→'; position: absolute; left: 0; color: var(--ink); font-weight: 700; }
+.entity-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.entity-chip { font-family: 'JetBrains Mono', monospace; font-size: .72rem; background: var(--ink); color: #fff; padding: .25rem .7rem; border-radius: 2px; }
+
+/* ── DASHBOARD ─────────────────────────────────────────────── */
+#dashboard { background: var(--steel); }
+#dashboard .section-label { color: rgba(255,255,255,.35); }
+#dashboard .section-title { color: #fff; }
+#dashboard .section-body { color: rgba(255,255,255,.6); }
+.insight-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+.insight-card { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); padding: 1.8rem; border-radius: 2px; }
+.insight-card h4 { font-size: .85rem; font-weight: 700; color: rgba(255,255,255,.9); margin-bottom: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+.insight-card p { font-size: .87rem; color: rgba(255,255,255,.55); line-height: 1.65; }
+.insight-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--amber); margin-bottom: .3rem; display: block; }
+.chart-area { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); padding: 2rem; margin-top: 3rem; border-radius: 2px; }
+.chart-area h3 { color: rgba(255,255,255,.7); font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 1.5rem; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.chart-box { position: relative; height: 220px; }
+.link-bar { display: flex; gap: 1rem; margin-top: 2rem; }
+.link-card { flex: 1; border: 1px solid rgba(255,255,255,.12); padding: 1.2rem 1.5rem; text-decoration: none; transition: background .2s; }
+.link-card:hover { background: rgba(255,255,255,.06); }
+.link-card-label { font-size: .7rem; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .1em; }
+.link-card-url { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--amber); margin-top: .3rem; }
+.link-card-desc { font-size: .8rem; color: rgba(255,255,255,.5); margin-top: .3rem; }
+
+/* ── SOLUTION ──────────────────────────────────────────────── */
+#solution { background: var(--paper); }
+.steps-flow { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; margin-top: 3rem; position: relative; }
+.step { padding: 1.5rem 1rem 1.5rem; text-align: center; border: 1px solid var(--rule); background: #fff; position: relative; }
+.step + .step { border-left: none; }
+.step-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--ink); display: block; }
+.step-icon { font-size: 1.4rem; margin: .5rem 0; display: block; }
+.step-title { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem; }
+.step-desc { font-size: .75rem; color: rgba(10,10,10,.55); line-height: 1.5; }
+.step-arrow { position: absolute; right: -12px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: var(--ink); z-index: 2; background: #fff; }
+.proto-feature-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2.5rem; }
+.proto-feature { border: 1px solid var(--rule); padding: 1.5rem; }
+.proto-feature-num { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: rgba(10,10,10,.35); }
+.proto-feature-title { font-weight: 700; font-size: .95rem; margin: .4rem 0; }
+.proto-feature-desc { font-size: .85rem; color: rgba(10,10,10,.6); line-height: 1.6; }
+
+/* ── ARCHITECTURE ──────────────────────────────────────────── */
+#architecture { background: var(--chalk); padding: 4rem 3rem; }
+.arch-title { font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-bottom: 2rem; }
+.arch-layers { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.arch-layer { display: grid; grid-template-columns: 160px 1fr; gap: 0; background: #fff; }
+.arch-layer-label { padding: 1.2rem 1.5rem; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; display: flex; align-items: center; border-right: 1px solid var(--rule); }
+.arch-layer-label.biz { background: #f0faf0; color: #1a5c1a; }
+.arch-layer-label.data { background: #f0f4fa; color: #1a3a6a; }
+.arch-layer-label.app { background: #fdf9f0; color: #6a4400; }
+.arch-layer-label.tech { background: #faf0f5; color: #6a1a3a; }
+.arch-layer-items { display: flex; gap: 1px; background: var(--rule); }
+.arch-item { flex: 1; padding: 1rem .8rem; background: #fff; font-size: .78rem; text-align: center; font-weight: 500; line-height: 1.4; }
+.arch-item small { display: block; font-size: .68rem; color: rgba(10,10,10,.45); font-weight: 400; margin-top: .2rem; }
+
+/* ── COMPARISON ────────────────────────────────────────────── */
+#comparison { background: var(--paper); }
+.kpi-compare-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+.kpi-compare-card { border: 1px solid var(--rule); padding: 1.8rem; background: #fff; }
+.kpi-name { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; color: rgba(10,10,10,.4); margin-bottom: 1rem; }
+.kpi-arrow-row { display: flex; align-items: center; gap: 1rem; }
+.kpi-before { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: rgba(10,10,10,.3); }
+.kpi-arrow-sym { font-size: 1.2rem; color: rgba(10,10,10,.2); }
+.kpi-after { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--ink); }
+.kpi-delta { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: .8rem; font-weight: 600; padding: .2rem .6rem; border-radius: 2px; margin-top: .6rem; }
+.kpi-delta.pos { background: #e8f5e0; color: #1a5c1a; }
+.kpi-delta.neg { background: #fde8e0; color: #8b1a0a; }
+.kpi-delta.new { background: var(--ink); color: #fff; }
+.kpi-desc { font-size: .8rem; color: rgba(10,10,10,.55); line-height: 1.6; margin-top: .8rem; }
+.big-number-row { display: flex; gap: 0; margin: 3rem 0 1rem; border: 1px solid var(--rule); }
+.big-num-item { flex: 1; padding: 2rem; text-align: center; border-right: 1px solid var(--rule); }
+.big-num-item:last-child { border-right: none; }
+.big-num-val { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; line-height: 1; }
+.big-num-lbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(10,10,10,.45); margin-top: .3rem; }
+.comparison-chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+.comp-chart-box { border: 1px solid var(--rule); padding: 1.5rem; background: #fff; }
+.comp-chart-box h4 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(10,10,10,.5); margin-bottom: 1rem; font-weight: 700; }
+.comp-chart-canvas { position: relative; height: 200px; }
+
+/* ── TEAM / CONCLUSION ─────────────────────────────────────── */
+#conclusion { background: var(--ink); color: #fff; }
+#conclusion .section-label { color: rgba(255,255,255,.3); }
+#conclusion .section-title { color: #fff; }
+.outcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2.5rem; }
+.outcome-item { border: 1px solid rgba(255,255,255,.08); padding: 1.5rem; }
+.outcome-item h4 { font-size: .85rem; font-weight: 700; color: rgba(255,255,255,.9); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .05em; }
+.outcome-item p { font-size: .87rem; color: rgba(255,255,255,.5); line-height: 1.65; }
+.team-section { margin-top: 4rem; border-top: 1px solid rgba(255,255,255,.08); padding-top: 3rem; }
+.team-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 1rem; margin-top: 2rem; }
+.team-card { border: 1px solid rgba(255,255,255,.08); padding: 1.5rem 1rem; text-align: center; }
+.team-initial { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--amber); display: block; }
+.team-name { font-size: .82rem; font-weight: 600; color: rgba(255,255,255,.9); margin-top: .3rem; }
+.team-role { font-size: .72rem; color: rgba(255,255,255,.35); margin-top: .2rem; text-transform: uppercase; letter-spacing: .05em; }
+.advisor-bar { margin-top: 2rem; text-align: center; font-size: .85rem; color: rgba(255,255,255,.35); }
+.advisor-bar strong { color: rgba(255,255,255,.6); }
+.next-steps { margin-top: 3rem; }
+.next-steps h3 { font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.4); margin-bottom: 1rem; }
+.next-steps-list { display: flex; gap: 1rem; flex-wrap: wrap; }
+.next-step-pill { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); padding: .6rem 1.2rem; font-size: .85rem; color: rgba(255,255,255,.7); border-radius: 2px; }
+
+/* ── FOOTER ────────────────────────────────────────────────── */
+footer { background: #000; color: rgba(255,255,255,.25); text-align: center; padding: 1.5rem; font-size: .78rem; letter-spacing: .05em; }
+
+/* ── SCROLL ANIMATIONS ─────────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+.reveal-delay-4 { transition-delay: .4s; }
+.reveal-delay-5 { transition-delay: .5s; }
+
+/* ── COUNTER ANIMATION ─────────────────────────────────────── */
+@keyframes fadeSlide { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+.hero-stats .stat-card { animation: fadeSlide .6s ease both; }
+.hero-stats .stat-card:nth-child(1) { animation-delay: .2s; }
+.hero-stats .stat-card:nth-child(2) { animation-delay: .35s; }
+.hero-stats .stat-card:nth-child(3) { animation-delay: .5s; }
+.hero-stats .stat-card:nth-child(4) { animation-delay: .65s; }
+.hero-stats .stat-card:nth-child(5) { animation-delay: .8s; }
+.hero-stats .stat-card:nth-child(6) { animation-delay: .95s; }
+
+@media (max-width: 900px) {
+  .hero-grid, .two-col, .dataset-grid, .chart-row, .comparison-chart-row, .outcome-grid { grid-template-columns: 1fr; }
+  .problem-cards, .insight-grid, .kpi-compare-grid, .proto-feature-grid { grid-template-columns: 1fr 1fr; }
+  .steps-flow { grid-template-columns: 1fr 1fr; }
+  .team-grid { grid-template-columns: repeat(3,1fr); }
+  nav { padding: 0 1.5rem; }
+  section { padding: 4rem 1.5rem; }
+  .arch-layer { grid-template-columns: 1fr; }
+  .arch-layer-label { border-right: none; border-bottom: 1px solid var(--rule); }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">BorrowBox</div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#data">Data</a></li>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#comparison">Results</a></li>
+    <li><a href="#conclusion">Team</a></li>
+  </ul>
+  <a href="https://harshithaj2000.github.io/borrowbox/" target="_blank" class="nav-cta">Live Dashboard</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-eyebrow">IS 5960 MRP — Saint Louis University — City of Toronto</div>
+      <h1 class="hero-title">Borrow<span>Box</span></h1>
+      <div class="hero-sub">A QR-based inventory tracking system for Toronto's municipal gear lending program — recovering lost items, attributing damage, and more than doubling inventory availability.</div>
+      <div class="hero-actions">
+        <a href="https://harshithaj2000.github.io/borrowbox/" target="_blank" class="btn-primary">Open Dashboard</a>
+        <a href="https://harshithaj2000.github.io/modelprototype/" target="_blank" class="btn-outline">Interactive Prototype</a>
+      </div>
+    </div>
+    <div>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-val bad">23.3%</div>
+          <div class="stat-lbl">Non-Return Rate</div>
+          <div class="stat-arrow up">▲ Baseline problem</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val bad">39.6%</div>
+          <div class="stat-lbl">Damage Rate on Return</div>
+          <div class="stat-arrow up">▲ Baseline problem</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val bad">46.3%</div>
+          <div class="stat-lbl">Inventory Available</div>
+          <div class="stat-arrow up">▲ Baseline — too low</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val good">4.7%</div>
+          <div class="stat-lbl">Non-Return Rate After</div>
+          <div class="stat-arrow down">▼ Post-QR target met</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val good">76.7%</div>
+          <div class="stat-lbl">Availability After</div>
+          <div class="stat-arrow down">▼ +30 percentage points</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val good">81.4%</div>
+          <div class="stat-lbl">Alert Response Rate</div>
+          <div class="stat-arrow down">▼ KPI 6 — new metric</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-bar">
+    <div class="hero-bar-item"><strong>12</strong>Neighbourhood Hubs</div>
+    <div class="hero-bar-item"><strong>3</strong>Equipment Categories</div>
+    <div class="hero-bar-item"><strong>2,520</strong>Dataset Records</div>
+    <div class="hero-bar-item"><strong>6</strong>KPIs Defined</div>
+    <div class="hero-bar-item"><strong>$77K</strong>Annual Loss Reduction</div>
+    <div class="hero-bar-item"><strong>5</strong>Team Members</div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="section-label">01 — Problem Overview</div>
+  <div class="two-col">
+    <div>
+      <h2 class="section-title">The program is losing nearly <em>half its inventory</em> with no way to notice.</h2>
+      <p class="section-body">BorrowBox is a free gear lending service run by the City of Toronto across twelve neighbourhood hubs. Patrons borrow tools, sports equipment, and camping gear at no cost. But the program operates with no item-level tracking — only manual spreadsheets — and has no system to monitor items after they leave a hub.</p>
+      <div class="stakeholder-pills" style="margin-top:1.5rem;">
+        <span class="pill">Patrons</span>
+        <span class="pill">Hub Staff</span>
+        <span class="pill">City Administrators</span>
+        <span class="pill">Operations Managers</span>
+      </div>
+    </div>
+    <div>
+      <p class="section-body">The gap produces three compounding, measurable failures that directly affect every patron who walks into a hub expecting to borrow equipment.</p>
+    </div>
+  </div>
+
+  <div class="problem-cards">
+    <div class="problem-card reveal">
+      <div class="problem-num">23.3%</div>
+      <div class="problem-unit">Non-Return Rate</div>
+      <div class="problem-title">Items That Never Come Back</div>
+      <div class="problem-desc">Nearly 1 in 4 checked-out items is never returned. Camping equipment is worst at 30.7%. Without patron-linked item records, staff have no reliable mechanism to identify missing items or contact responsible patrons.</div>
+    </div>
+    <div class="problem-card reveal reveal-delay-2">
+      <div class="problem-num">39.6%</div>
+      <div class="problem-unit">Damage Rate on Return</div>
+      <div class="problem-title">Items Returned Damaged</div>
+      <div class="problem-desc">Of items that do come back, 39.6% arrive damaged or with missing parts and cannot be re-lent until repaired. There is no condition logging system, so damage cannot be attributed to specific patrons.</div>
+    </div>
+    <div class="problem-card reveal reveal-delay-3">
+      <div class="problem-num">63.3</div>
+      <div class="problem-unit">Average Days Overdue</div>
+      <div class="problem-title">No Overdue Detection</div>
+      <div class="problem-desc">Without tracking, overdue items remain undetected for an average of 63 days before staff notice. By then, recovery is often impossible. Annual replacement cost: approximately $95,000.</div>
+    </div>
+  </div>
+
+  <div class="impact-bar reveal">
+    <div class="impact-bar-text">
+      <strong>$95,000</strong>
+      Estimated annual replacement cost from inventory loss
+    </div>
+    <div class="impact-bar-text">
+      <strong>46.3%</strong>
+      Of registered items available at any moment — under half
+    </div>
+    <div class="impact-bar-text">
+      <strong>0</strong>
+      Automated systems for overdue detection, alerts, or condition logging currently in place
+    </div>
+  </div>
+</section>
+
+<!-- DATA -->
+<section id="data">
+  <div class="section-label">02 — Data Design</div>
+  <h2 class="section-title">Two synthetic datasets. One story of before and after.</h2>
+  <p class="section-body">Both datasets were generated using Python (pandas, numpy) with 2,520 records each, calibrated to documented BorrowBox operational statistics (Dataset 1) and Canadian library case study benchmarks (Dataset 2).</p>
+
+  <div class="dataset-grid">
+    <div class="dataset-block reveal">
+      <div class="dataset-label">Dataset 1 — Current State</div>
+      <h3>2,520 records × current BorrowBox conditions</h3>
+      <ul class="rule-list">
+        <li>Non-return probability = Base_Rate(Category) × Hub_Multiplier × Month_Multiplier</li>
+        <li>Base rates: Tools 18.4%, Sports 21.2%, Camping 31.2%</li>
+        <li>Hub multipliers: 0.75 (best) → 1.35 (worst) reflecting hub-level variation</li>
+        <li>Seasonal multiplier: 0.80 in January rising to 1.19 in December</li>
+        <li>Return condition: Good/Damaged/Missing Parts/Unusable by category distribution</li>
+        <li>Replacement costs: Tools $45–$280, Sports $25–$180, Camping $60–$350</li>
+      </ul>
+    </div>
+    <div class="dataset-block reveal reveal-delay-2">
+      <div class="dataset-label">Dataset 2 — Post-QR State</div>
+      <h3>2,520 records × post-implementation benchmarks</h3>
+      <ul class="rule-list">
+        <li>Non-return rates reduced: Tools 4.2%, Sports 3.8%, Camping 5.5%</li>
+        <li>Return condition improved: Good 82–85% depending on category</li>
+        <li>Days overdue compressed to U(1,8) — alert-driven rapid recovery</li>
+        <li>Alert entity added: 81.4% of overdue transactions show patron response within 48h</li>
+        <li>Calibrated to Canadian library QR tracking deployment benchmarks</li>
+        <li>Random seed: 99 (reproducible; seed: 42 for Dataset 1)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:2.5rem;" class="reveal">
+    <div class="dataset-label">Data Model — 5 Entities</div>
+    <div class="entity-chips" style="margin-top:.5rem;">
+      <span class="entity-chip">Item (QR_Code, Status, Category)</span>
+      <span class="entity-chip">Patron (ID, Email, Phone)</span>
+      <span class="entity-chip">Transaction (Checkout, Return, Condition)</span>
+      <span class="entity-chip">Alert (Sent_Date, Responded)</span>
+      <span class="entity-chip">Hub (Location, Capacity)</span>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard">
+  <div class="section-label">03 — Dashboard Insights</div>
+  <h2 class="section-title">Six sections. Every insight is in the data.</h2>
+  <p class="section-body">The live dashboard loads Dataset 1 (current state) with 260 pre-aggregated filter combinations across hub, category, and quarter.</p>
+
+  <div class="insight-grid">
+    <div class="insight-card reveal">
+      <span class="insight-num">30.7%</span>
+      <h4>Camping Non-Return</h4>
+      <p>The category chart shows Camping at 30.7% — nearly double Tools (16.8%). Highest-value, highest-loss category requires most urgent intervention.</p>
+    </div>
+    <div class="insight-card reveal reveal-delay-2">
+      <span class="insight-num">+76%</span>
+      <h4>Seasonal Escalation</h4>
+      <p>The monthly trend rises from 16.2% in January to 28.4% in December — a 76% increase. Losses compound across the year without a recovery mechanism.</p>
+    </div>
+    <div class="insight-card reveal reveal-delay-3">
+      <span class="insight-num">Hub 3, 6, 9</span>
+      <h4>Worst-Performing Hubs</h4>
+      <p>The hub availability chart identifies three hubs below 35% availability. These locations account for a disproportionate share of program-wide inventory loss.</p>
+    </div>
+    <div class="insight-card reveal reveal-delay-1">
+      <span class="insight-num">39.6%</span>
+      <h4>Damage at Return</h4>
+      <p>The condition donut shows only 60.4% of returned items are in Good condition. 22.4% Damaged, 13.5% Missing Parts, 3.7% Unusable. All need repair before re-lending.</p>
+    </div>
+    <div class="insight-card reveal reveal-delay-2">
+      <span class="insight-num">No System</span>
+      <h4>KPI 6 Baseline</h4>
+      <p>Section 05 shows KPI 6 (Alert Response Rate) at baseline: no automated system existed. The card explicitly marks this as "New KPI" introduced by the solution.</p>
+    </div>
+    <div class="insight-card reveal reveal-delay-3">
+      <span class="insight-num">$95,000</span>
+      <h4>Annual Loss Cost</h4>
+      <p>KPI 5 aggregates replacement costs for all missing and written-off items. This number is the financial argument for implementing the QR system immediately.</p>
+    </div>
+  </div>
+
+  <div class="chart-area reveal">
+    <h3>Dashboard Data Preview — Key Trends</h3>
+    <div class="chart-row">
+      <div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.08em;">Non-Return Rate by Category</div>
+        <div class="chart-box"><canvas id="catChart"></canvas></div>
+      </div>
+      <div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.08em;">Monthly Non-Return Rate Trend (Dataset 1)</div>
+        <div class="chart-box"><canvas id="monthChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="link-bar">
+    <a href="https://harshithaj2000.github.io/borrowbox/" target="_blank" class="link-card">
+      <div class="link-card-label">Live Dashboard</div>
+      <div class="link-card-url">harshithaj2000.github.io/borrowbox/</div>
+      <div class="link-card-desc">Full interactive dashboard — 6 sections, 260 filter combinations, Dataset 1 + Dataset 2</div>
+    </a>
+    <a href="https://harshithaj2000.github.io/modelprototype/" target="_blank" class="link-card">
+      <div class="link-card-label">Interactive Prototype</div>
+      <div class="link-card-url">harshithaj2000.github.io/modelprototype/</div>
+      <div class="link-card-desc">6-page QR system prototype — Scan Out, Scan In, Overdue Alerts, Live Inventory, Item History, Overview</div>
+    </a>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="section-label">04 — Proposed Solution</div>
+  <h2 class="section-title">A QR scan at every checkout and return. That's the whole intervention.</h2>
+  <p class="section-body">The BorrowBox QR Inventory Tracking System attaches a unique QR label to every item. Every transaction creates a complete, patron-linked record. Overdue alerts dispatch automatically within 24 hours. Return condition is logged at scan. Nothing requires new hardware beyond a tablet or phone camera.</p>
+
+  <div class="steps-flow" style="margin-top:2.5rem;">
+    <div class="step reveal">
+      <span class="step-num">01</span>
+      <span class="step-icon">📋</span>
+      <div class="step-title">Checkout</div>
+      <div class="step-desc">Staff scan QR + enter patron ID. System creates transaction, sets due date, status → On Loan.</div>
+      <span class="step-arrow">›</span>
+    </div>
+    <div class="step reveal reveal-delay-1">
+      <span class="step-num">02</span>
+      <span class="step-icon">🔔</span>
+      <div class="step-title">Alert Dispatch</div>
+      <div class="step-desc">24 hours after due date breach, automated overdue notification sent to patron email or SMS.</div>
+      <span class="step-arrow">›</span>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <span class="step-num">03</span>
+      <span class="step-icon">📦</span>
+      <div class="step-title">Return Scan</div>
+      <div class="step-desc">Staff scan item at return. System prompts condition: Good / Damaged / Missing Parts / Unusable.</div>
+      <span class="step-arrow">›</span>
+    </div>
+    <div class="step reveal reveal-delay-3">
+      <span class="step-num">04</span>
+      <span class="step-icon">📊</span>
+      <div class="step-title">Status Update</div>
+      <div class="step-desc">Item_Status updated instantly. Good → Available. Others → Out of Service. Dashboard reflects change.</div>
+      <span class="step-arrow">›</span>
+    </div>
+    <div class="step reveal reveal-delay-4">
+      <span class="step-num">05</span>
+      <span class="step-icon">📈</span>
+      <div class="step-title">Analytics</div>
+      <div class="step-desc">All scan events stored. Hub managers view availability, loss rates, overdue stats, item history.</div>
+    </div>
+  </div>
+
+  <div class="proto-feature-grid" style="margin-top:3rem;">
+    <div class="proto-feature reveal">
+      <div class="proto-feature-num">Page 01</div>
+      <div class="proto-feature-title">Scan Out</div>
+      <div class="proto-feature-desc">Patron ID entry, item selection from live inventory, due date assignment. One form. No spreadsheet.</div>
+    </div>
+    <div class="proto-feature reveal reveal-delay-1">
+      <div class="proto-feature-num">Page 02</div>
+      <div class="proto-feature-title">Scan In</div>
+      <div class="proto-feature-desc">Return scan with four-option condition prompt. Good goes directly to Available. Others flagged for repair.</div>
+    </div>
+    <div class="proto-feature reveal reveal-delay-2">
+      <div class="proto-feature-num">Page 03</div>
+      <div class="proto-feature-title">Overdue Alerts</div>
+      <div class="proto-feature-desc">Real-time overdue table with days past due, patron contact, and alert status. One-click resend.</div>
+    </div>
+    <div class="proto-feature reveal reveal-delay-3">
+      <div class="proto-feature-num">Page 04</div>
+      <div class="proto-feature-title">Live Inventory</div>
+      <div class="proto-feature-desc">Per-hub availability grid across all 12 hubs, filterable by category. Colour-coded by performance level.</div>
+    </div>
+    <div class="proto-feature reveal reveal-delay-4">
+      <div class="proto-feature-num">Page 05</div>
+      <div class="proto-feature-title">Item History</div>
+      <div class="proto-feature-desc">Full audit trail for any item: every checkout, every return, every condition, every patron linked.</div>
+    </div>
+    <div class="proto-feature reveal reveal-delay-5">
+      <div class="proto-feature-num">Page 06</div>
+      <div class="proto-feature-title">Solution Overview</div>
+      <div class="proto-feature-desc">KPI before-and-after summary for management. All six KPIs with baseline vs target comparison.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="section-label">04b — Enterprise Architecture</div>
+  <h2 class="arch-title">TOGAF ADM — Four Layers</h2>
+  <div class="arch-layers reveal">
+    <div class="arch-layer">
+      <div class="arch-layer-label biz">Business<br>Layer</div>
+      <div class="arch-layer-items">
+        <div class="arch-item">Patron Reservation & Checkout<small>Process</small></div>
+        <div class="arch-item">QR Scan Out<small>Process</small></div>
+        <div class="arch-item">QR Scan In & Condition Logging<small>Process</small></div>
+        <div class="arch-item">Overdue Detection & Alert<small>Process</small></div>
+        <div class="arch-item">Inventory Review & Reporting<small>Process</small></div>
+      </div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-layer-label data">Data<br>Layer</div>
+      <div class="arch-layer-items">
+        <div class="arch-item">Item Entity<small>QR code, status</small></div>
+        <div class="arch-item">Patron Entity<small>ID, contact</small></div>
+        <div class="arch-item">Transaction Entity<small>checkout / return</small></div>
+        <div class="arch-item">Alert Entity<small>sent, responded</small></div>
+        <div class="arch-item">Hub Entity<small>location, capacity</small></div>
+      </div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-layer-label app">Application<br>Layer</div>
+      <div class="arch-layer-items">
+        <div class="arch-item">Scan Out Interface<small>Page 1</small></div>
+        <div class="arch-item">Scan In Interface<small>Page 2</small></div>
+        <div class="arch-item">Overdue Alerts Dashboard<small>Page 3</small></div>
+        <div class="arch-item">Live Inventory Dashboard<small>Page 4</small></div>
+        <div class="arch-item">Item History Viewer<small>Page 5</small></div>
+      </div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-layer-label tech">Technology<br>Layer</div>
+      <div class="arch-layer-items">
+        <div class="arch-item">MySQL<small>Database</small></div>
+        <div class="arch-item">Python 3<small>pandas / scikit-learn</small></div>
+        <div class="arch-item">HTML5 / Chart.js<small>Frontend</small></div>
+        <div class="arch-item">GitHub Pages<small>Hosting — $0</small></div>
+        <div class="arch-item">QR Labels<small>Physical — $0.10 each</small></div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:.85rem;color:rgba(10,10,10,.45);margin-top:1rem;">Total software licensing cost: $0. All tools open-source or free-tier. Entire implementation recoverable within weeks of operation.</p>
+</section>
+
+<!-- COMPARISON -->
+<section id="comparison">
+  <div class="section-label">05 — Data 1 vs Data 2 — Simulated Improvements</div>
+  <h2 class="section-title">Every KPI target met. Availability more than doubled.</h2>
+  <p class="section-body">Dataset 1 = current state (calibrated to BorrowBox statistics). Dataset 2 = post-QR state (calibrated to Canadian library case study benchmarks). Both contain 2,520 records.</p>
+
+  <div class="big-number-row reveal">
+    <div class="big-num-item">
+      <div class="big-num-val" style="color:var(--moss);">−80%</div>
+      <div class="big-num-lbl">Non-Return Rate Reduction</div>
+    </div>
+    <div class="big-num-item">
+      <div class="big-num-val" style="color:var(--moss);">−51%</div>
+      <div class="big-num-lbl">Damage Rate Reduction</div>
+    </div>
+    <div class="big-num-item">
+      <div class="big-num-val" style="color:var(--moss);">+30pp</div>
+      <div class="big-num-lbl">Availability Increase</div>
+    </div>
+    <div class="big-num-item">
+      <div class="big-num-val" style="color:var(--moss);">−93%</div>
+      <div class="big-num-lbl">Days Overdue Reduction</div>
+    </div>
+    <div class="big-num-item">
+      <div class="big-num-val" style="color:var(--moss);">−81%</div>
+      <div class="big-num-lbl">Annual Loss Cost Reduction</div>
+    </div>
+  </div>
+
+  <div class="kpi-compare-grid">
+    <div class="kpi-compare-card reveal">
+      <div class="kpi-name">KPI 1 — Non-Return Rate</div>
+      <div class="kpi-arrow-row">
+        <span class="kpi-before">23.3%</span>
+        <span class="kpi-arrow-sym">→</span>
+        <span class="kpi-after">4.7%</span>
+      </div>
+      <span class="kpi-delta neg">−18.6 pp</span>
+      <div class="kpi-desc">Patron accountability through QR-linked records plus automated alerts recovers items before they become permanent losses. Formula: (NR ÷ C) × 100</div>
+    </div>
+    <div class="kpi-compare-card reveal reveal-delay-1">
+      <div class="kpi-name">KPI 2 — Damage Rate on Return</div>
+      <div class="kpi-arrow-row">
+        <span class="kpi-before">39.6%</span>
+        <span class="kpi-arrow-sym">→</span>
+        <span class="kpi-after">19.5%</span>
+      </div>
+      <span class="kpi-delta neg">−20.1 pp</span>
+      <div class="kpi-desc">Condition logging at every scan forces documentation. Patrons know returns are recorded — behaviour changes. Formula: (D ÷ R) × 100</div>
+    </div>
+    <div class="kpi-compare-card reveal reveal-delay-2">
+      <div class="kpi-name">KPI 3 — Inventory Availability</div>
+      <div class="kpi-arrow-row">
+        <span class="kpi-before">46.3%</span>
+        <span class="kpi-arrow-sym">→</span>
+        <span class="kpi-after">76.7%</span>
+      </div>
+      <span class="kpi-delta pos">+30.4 pp</span>
+      <div class="kpi-desc">The direct result of recovering non-returns and reducing damage. Good condition returns go straight back to Available. Formula: (A ÷ T) × 100</div>
+    </div>
+    <div class="kpi-compare-card reveal">
+      <div class="kpi-name">KPI 4 — Average Days Overdue</div>
+      <div class="kpi-arrow-row">
+        <span class="kpi-before">63.3d</span>
+        <span class="kpi-arrow-sym">→</span>
+        <span class="kpi-after">4.5d</span>
+      </div>
+      <span class="kpi-delta neg">−93%</span>
+      <div class="kpi-desc">Entirely driven by KPI 6. When 81.4% of patrons respond within 48 hours, items come back fast. Formula: Σ(DOᵢ) ÷ N</div>
+    </div>
+    <div class="kpi-compare-card reveal reveal-delay-1">
+      <div class="kpi-name">KPI 5 — Annual Loss Cost</div>
+      <div class="kpi-arrow-row">
+        <span class="kpi-before">$95K</span>
+        <span class="kpi-arrow-sym">→</span>
+        <span class="kpi-after">$18K</span>
+      </div>
+      <span class="kpi-delta neg">−$77,000</span>
+      <div class="kpi-desc">Fewer missing items means fewer replacements. QR labels cost under $0.10 each. System pays for itself within weeks. Formula: Σ(RCᵢ) for M∪WO</div>
+    </div>
+    <div class="kpi-compare-card reveal reveal-delay-2" style="border: 2px solid var(--ink);">
+      <div class="kpi-name">KPI 6 — Alert Response Rate <span style="background:var(--ink);color:#fff;font-size:.65rem;padding:.15rem .5rem;margin-left:.3rem;border-radius:2px;">NEW</span></div>
+      <div class="kpi-arrow-row">
+        <span class="kpi-before" style="font-size:1.4rem;">No System</span>
+        <span class="kpi-arrow-sym">→</span>
+        <span class="kpi-after">81.4%</span>
+      </div>
+      <span class="kpi-delta new">Target exceeded (+1.4pp)</span>
+      <div class="kpi-desc">No baseline — no alert system existed before QR. 96 of 118 overdue alerts resulted in return within 48 hours. Formula: (AR ÷ AS) × 100</div>
+    </div>
+  </div>
+
+  <div class="comparison-chart-row reveal">
+    <div class="comp-chart-box">
+      <h4>Non-Return Rate: Dataset 1 vs Dataset 2</h4>
+      <div class="comp-chart-canvas"><canvas id="nrCompChart"></canvas></div>
+    </div>
+    <div class="comp-chart-box">
+      <h4>Inventory Availability: Dataset 1 vs Dataset 2</h4>
+      <div class="comp-chart-canvas"><canvas id="avCompChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section id="conclusion">
+  <div class="section-label">06 — Conclusion & Impact</div>
+  <h2 class="section-title">A $0 software cost that saves $77,000 a year.</h2>
+
+  <div class="outcome-grid">
+    <div class="outcome-item reveal">
+      <h4>Primary Outcome</h4>
+      <p>Inventory availability rises from 46.3% to 76.7% — a 30 percentage point gain. More items available means more patrons served, which is the entire point of the program.</p>
+    </div>
+    <div class="outcome-item reveal reveal-delay-1">
+      <h4>Financial Impact</h4>
+      <p>Annual loss cost falls from $95,000 to $18,000 — an 81% reduction. QR label cost per item: under $0.10. Full system cost: $0 in software licensing. ROI is measured in weeks.</p>
+    </div>
+    <div class="outcome-item reveal reveal-delay-2">
+      <h4>Scope Pivot</h4>
+      <p>Original scope: no-show prediction ML model (AUC 0.82 — target met). Redirected by Dr. Cardona in Week 6 to the more significant inventory loss problem. ML model retained as secondary deliverable.</p>
+    </div>
+    <div class="outcome-item reveal reveal-delay-3">
+      <h4>Academic Contribution</h4>
+      <p>16 verified sources. Synthetic datasets calibrated to Canadian library benchmarks. TOGAF ADM enterprise architecture. 6 KPIs with formulas derived from dataset variables. All validated against dashboard outputs.</p>
+    </div>
+  </div>
+
+  <div class="next-steps reveal">
+    <h3>Next Steps</h3>
+    <div class="next-steps-list">
+      <span class="next-step-pill">6-hub pilot with real QR labels</span>
+      <span class="next-step-pill">3-month data collection period</span>
+      <span class="next-step-pill">KPI validation against real patron behaviour</span>
+      <span class="next-step-pill">City of Toronto platform integration</span>
+      <span class="next-step-pill">Mobile app for patron self-service</span>
+      <span class="next-step-pill">ML demand forecasting from transaction data</span>
+      <span class="next-step-pill">RFID upgrade path (architecture ready)</span>
+    </div>
+  </div>
+
+  <div class="team-section reveal">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:1.5rem;">The Team</div>
+    <div class="team-grid">
+      <div class="team-card">
+        <span class="team-initial">H</span>
+        <div class="team-name">Harshitha Jananeela</div>
+        <div class="team-role">Project Manager</div>
+      </div>
+      <div class="team-card">
+        <span class="team-initial">B</span>
+        <div class="team-name">Badrinath Lagadapati</div>
+        <div class="team-role">Business Analyst</div>
+      </div>
+      <div class="team-card">
+        <span class="team-initial">R</span>
+        <div class="team-name">Ranjith Kumar Peram</div>
+        <div class="team-role">Data Analyst</div>
+      </div>
+      <div class="team-card">
+        <span class="team-initial">P</span>
+        <div class="team-name">Pavan Vegesna</div>
+        <div class="team-role">System Architect</div>
+      </div>
+      <div class="team-card">
+        <span class="team-initial">N</span>
+        <div class="team-name">Nadeem Mohammad</div>
+        <div class="team-role">Documentation</div>
+      </div>
+    </div>
+    <div class="advisor-bar">Advisor: <strong>Dr. Tatiana Cardona</strong> — Information Systems Department, Saint Louis University — IS 5960 Master Research Project — March 2026</div>
+  </div>
+</section>
+
+<footer>
+  BorrowBox QR Inventory Tracking System &nbsp;·&nbsp; IS 5960 MRP &nbsp;·&nbsp; Saint Louis University &nbsp;·&nbsp; City of Toronto &nbsp;·&nbsp; March 2026
+</footer>
+
+<script>
+// ── Scroll reveal ───────────────────────────────────────────
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── Chart defaults ──────────────────────────────────────────
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = 'rgba(255,255,255,0.45)';
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── Category chart (dashboard section) ─────────────────────
+new Chart(document.getElementById('catChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Tools','Sports','Camping'],
+    datasets: [{
+      label: 'Non-Return Rate (%)',
+      data: [16.8, 19.4, 30.7],
+      backgroundColor: ['rgba(255,255,255,0.25)','rgba(255,255,255,0.35)','rgba(192,57,43,0.75)'],
+      borderRadius: 2,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.4)' } },
+      y: { min: 0, max: 40, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { callback: v => v+'%', color: 'rgba(255,255,255,0.4)' } }
+    }
+  }
+});
+
+// ── Monthly trend chart ─────────────────────────────────────
+new Chart(document.getElementById('monthChart'), {
+  type: 'line',
+  data: {
+    labels: MONTHS,
+    datasets: [{
+      label: 'Non-Return Rate (%)',
+      data: [16.2,17.1,18.3,19.5,21.2,22.8,23.4,24.1,25.3,26.8,27.5,28.4],
+      borderColor: '#fff',
+      backgroundColor: 'rgba(255,255,255,0.06)',
+      borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3,
+      pointBackgroundColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10 } } },
+      y: { min: 0, max: 35, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { callback: v => v+'%', color: 'rgba(255,255,255,0.4)' } }
+    }
+  }
+});
+
+// ── Comparison charts (dark text for light background) ──────
+Chart.defaults.color = 'rgba(10,10,10,0.45)';
+
+// Non-return comparison
+new Chart(document.getElementById('nrCompChart'), {
+  type: 'line',
+  data: {
+    labels: MONTHS,
+    datasets: [
+      {
+        label: 'Before (Dataset 1)',
+        data: [16.2,17.1,18.3,19.5,21.2,22.8,23.4,24.1,25.3,26.8,27.5,28.4],
+        borderColor: '#aaaaaa', borderDash: [6,4], borderWidth: 1.5,
+        fill: false, tension: 0.4, pointRadius: 2
+      },
+      {
+        label: 'After (Dataset 2)',
+        data: [4.1,4.3,4.5,4.6,4.8,4.7,4.9,4.6,4.8,4.7,4.9,4.7],
+        borderColor: '#0a0a0a', borderWidth: 2,
+        fill: false, tension: 0.4, pointRadius: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { color: 'rgba(10,10,10,0.6)', font: { size: 11 } } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: 'rgba(10,10,10,0.4)', font: { size: 10 } } },
+      y: { min: 0, max: 35, grid: { color: 'rgba(10,10,10,0.06)' }, ticks: { callback: v => v+'%', color: 'rgba(10,10,10,0.4)' } }
+    }
+  }
+});
+
+// Availability comparison
+new Chart(document.getElementById('avCompChart'), {
+  type: 'line',
+  data: {
+    labels: MONTHS,
+    datasets: [
+      {
+        label: 'Before (Dataset 1)',
+        data: [54,52,50,49,47,46,44,43,42,41,40,39],
+        borderColor: '#aaaaaa', borderDash: [6,4], borderWidth: 1.5,
+        fill: false, tension: 0.4, pointRadius: 2
+      },
+      {
+        label: 'After (Dataset 2)',
+        data: [72,73,75,76,77,77,78,77,76,77,78,77],
+        borderColor: '#0a0a0a', borderWidth: 2,
+        fill: false, tension: 0.4, pointRadius: 2
+      },
+      {
+        label: '75% Target',
+        data: MONTHS.map(() => 75),
+        borderColor: 'rgba(10,10,10,0.2)', borderDash: [3,3], borderWidth: 1,
+        fill: false, pointRadius: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { color: 'rgba(10,10,10,0.6)', font: { size: 11 } } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: 'rgba(10,10,10,0.4)', font: { size: 10 } } },
+      y: { min: 0, max: 100, grid: { color: 'rgba(10,10,10,0.06)' }, ticks: { callback: v => v+'%', color: 'rgba(10,10,10,0.4)' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
