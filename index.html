@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BorrowBox — QR Inventory Tracking System | IS 5960 MRP</title>
+<title>BorrowBox: QR Inventory Tracking System | IS 5960 MRP</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -256,9 +256,9 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 <section id="hero">
   <div class="hero-grid">
     <div>
-      <div class="hero-eyebrow">IS 5960 MRP — Saint Louis University — City of Toronto</div>
+      <div class="hero-eyebrow">IS 5960 MRP | Saint Louis University | City of Toronto</div>
       <h1 class="hero-title">Borrow<span>Box</span></h1>
-      <div class="hero-sub">A QR-based inventory tracking system for Toronto's municipal gear lending program — recovering lost items, attributing damage, and more than doubling inventory availability.</div>
+      <div class="hero-sub">A QR-based inventory tracking system for Toronto's municipal gear lending program. It recovers lost items, attributes damage, and more than doubling inventory availability.</div>
       <div class="hero-actions">
         <a href="https://harshithaj2000.github.io/borrowbox/" target="_blank" class="btn-primary">Open Dashboard</a>
         <a href="https://harshithaj2000.github.io/modelprototype/" target="_blank" class="btn-outline">Interactive Prototype</a>
@@ -279,7 +279,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
         <div class="stat-card">
           <div class="stat-val bad">46.3%</div>
           <div class="stat-lbl">Inventory Available</div>
-          <div class="stat-arrow up">▲ Baseline — too low</div>
+          <div class="stat-arrow up">▲ Baseline: too low</div>
         </div>
         <div class="stat-card">
           <div class="stat-val good">4.7%</div>
@@ -294,7 +294,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
         <div class="stat-card">
           <div class="stat-val good">81.4%</div>
           <div class="stat-lbl">Alert Response Rate</div>
-          <div class="stat-arrow down">▼ KPI 6 — new metric</div>
+          <div class="stat-arrow down">▼ KPI 6. new metric</div>
         </div>
       </div>
     </div>
@@ -311,11 +311,11 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 
 <!-- PROBLEM -->
 <section id="problem">
-  <div class="section-label">01 — Problem Overview</div>
+  <div class="section-label">01. Problem Overview</div>
   <div class="two-col">
     <div>
       <h2 class="section-title">The program is losing nearly <em>half its inventory</em> with no way to notice.</h2>
-      <p class="section-body">BorrowBox is a free gear lending service run by the City of Toronto across twelve neighbourhood hubs. Patrons borrow tools, sports equipment, and camping gear at no cost. But the program operates with no item-level tracking — only manual spreadsheets — and has no system to monitor items after they leave a hub.</p>
+      <p class="section-body">BorrowBox is a free gear lending service run by the City of Toronto across twelve neighbourhood hubs. Patrons borrow tools, sports equipment, and camping gear at no cost. But the program operates with no item-level tracking, only manual spreadsheets, and has no system to monitor items after they leave a hub.</p>
       <div class="stakeholder-pills" style="margin-top:1.5rem;">
         <span class="pill">Patrons</span>
         <span class="pill">Hub Staff</span>
@@ -356,7 +356,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
     </div>
     <div class="impact-bar-text">
       <strong>46.3%</strong>
-      Of registered items available at any moment — under half
+      Of registered items available at any moment. Under half
     </div>
     <div class="impact-bar-text">
       <strong>0</strong>
@@ -367,13 +367,13 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 
 <!-- DATA -->
 <section id="data">
-  <div class="section-label">02 — Data Design</div>
+  <div class="section-label">02. Data Design</div>
   <h2 class="section-title">Two synthetic datasets. One story of before and after.</h2>
   <p class="section-body">Both datasets were generated using Python (pandas, numpy) with 2,520 records each, calibrated to documented BorrowBox operational statistics (Dataset 1) and Canadian library case study benchmarks (Dataset 2).</p>
 
   <div class="dataset-grid">
     <div class="dataset-block reveal">
-      <div class="dataset-label">Dataset 1 — Current State</div>
+      <div class="dataset-label">Dataset 1. Current State</div>
       <h3>2,520 records × current BorrowBox conditions</h3>
       <ul class="rule-list">
         <li>Non-return probability = Base_Rate(Category) × Hub_Multiplier × Month_Multiplier</li>
@@ -385,12 +385,12 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
       </ul>
     </div>
     <div class="dataset-block reveal reveal-delay-2">
-      <div class="dataset-label">Dataset 2 — Post-QR State</div>
+      <div class="dataset-label">Dataset 2. Post-QR State</div>
       <h3>2,520 records × post-implementation benchmarks</h3>
       <ul class="rule-list">
         <li>Non-return rates reduced: Tools 4.2%, Sports 3.8%, Camping 5.5%</li>
         <li>Return condition improved: Good 82–85% depending on category</li>
-        <li>Days overdue compressed to U(1,8) — alert-driven rapid recovery</li>
+        <li>Days overdue compressed to U(1,8), reflecting alert-driven rapid recovery</li>
         <li>Alert entity added: 81.4% of overdue transactions show patron response within 48h</li>
         <li>Calibrated to Canadian library QR tracking deployment benchmarks</li>
         <li>Random seed: 99 (reproducible; seed: 42 for Dataset 1)</li>
@@ -399,7 +399,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
   </div>
 
   <div style="margin-top:2.5rem;" class="reveal">
-    <div class="dataset-label">Data Model — 5 Entities</div>
+    <div class="dataset-label">Data Model: 5 Entities</div>
     <div class="entity-chips" style="margin-top:.5rem;">
       <span class="entity-chip">Item (QR_Code, Status, Category)</span>
       <span class="entity-chip">Patron (ID, Email, Phone)</span>
@@ -412,7 +412,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 
 <!-- DASHBOARD -->
 <section id="dashboard">
-  <div class="section-label">03 — Dashboard Insights</div>
+  <div class="section-label">03. Dashboard Insights</div>
   <h2 class="section-title">Six sections. Every insight is in the data.</h2>
   <p class="section-body">The live dashboard loads Dataset 1 (current state) with 260 pre-aggregated filter combinations across hub, category, and quarter.</p>
 
@@ -420,12 +420,12 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
     <div class="insight-card reveal">
       <span class="insight-num">30.7%</span>
       <h4>Camping Non-Return</h4>
-      <p>The category chart shows Camping at 30.7% — nearly double Tools (16.8%). Highest-value, highest-loss category requires most urgent intervention.</p>
+      <p>The category chart shows Camping at 30.7%, nearly double Tools (16.8%). Highest-value, highest-loss category requires most urgent intervention.</p>
     </div>
     <div class="insight-card reveal reveal-delay-2">
       <span class="insight-num">+76%</span>
       <h4>Seasonal Escalation</h4>
-      <p>The monthly trend rises from 16.2% in January to 28.4% in December — a 76% increase. Losses compound across the year without a recovery mechanism.</p>
+      <p>The monthly trend rises from 16.2% in January to 28.4% in December, a 76% increase. Losses compound across the year without a recovery mechanism.</p>
     </div>
     <div class="insight-card reveal reveal-delay-3">
       <span class="insight-num">Hub 3, 6, 9</span>
@@ -450,7 +450,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
   </div>
 
   <div class="chart-area reveal">
-    <h3>Dashboard Data Preview — Key Trends</h3>
+    <h3>Dashboard Data Preview</h3>
     <div class="chart-row">
       <div>
         <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.08em;">Non-Return Rate by Category</div>
@@ -467,19 +467,19 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
     <a href="https://harshithaj2000.github.io/borrowbox/" target="_blank" class="link-card">
       <div class="link-card-label">Live Dashboard</div>
       <div class="link-card-url">harshithaj2000.github.io/borrowbox/</div>
-      <div class="link-card-desc">Full interactive dashboard — 6 sections, 260 filter combinations, Dataset 1 + Dataset 2</div>
+      <div class="link-card-desc">Full interactive dashboard: 6 sections, 260 filter combinations, Dataset 1 and Dataset 2</div>
     </a>
     <a href="https://harshithaj2000.github.io/modelprototype/" target="_blank" class="link-card">
       <div class="link-card-label">Interactive Prototype</div>
       <div class="link-card-url">harshithaj2000.github.io/modelprototype/</div>
-      <div class="link-card-desc">6-page QR system prototype — Scan Out, Scan In, Overdue Alerts, Live Inventory, Item History, Overview</div>
+      <div class="link-card-desc">6-page QR system prototype: Scan Out, Scan In, Overdue Alerts, Live Inventory, Item History, Overview</div>
     </a>
   </div>
 </section>
 
 <!-- SOLUTION -->
 <section id="solution">
-  <div class="section-label">04 — Proposed Solution</div>
+  <div class="section-label">04. Proposed Solution</div>
   <h2 class="section-title">A QR scan at every checkout and return. That's the whole intervention.</h2>
   <p class="section-body">The BorrowBox QR Inventory Tracking System attaches a unique QR label to every item. Every transaction creates a complete, patron-linked record. Overdue alerts dispatch automatically within 24 hours. Return condition is logged at scan. Nothing requires new hardware beyond a tablet or phone camera.</p>
 
@@ -556,8 +556,8 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 
 <!-- ARCHITECTURE -->
 <section id="architecture">
-  <div class="section-label">04b — Enterprise Architecture</div>
-  <h2 class="arch-title">TOGAF ADM — Four Layers</h2>
+  <div class="section-label">04b. Enterprise Architecture</div>
+  <h2 class="arch-title">TOGAF ADM: Four Layers</h2>
   <div class="arch-layers reveal">
     <div class="arch-layer">
       <div class="arch-layer-label biz">Business<br>Layer</div>
@@ -595,8 +595,8 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
         <div class="arch-item">MySQL<small>Database</small></div>
         <div class="arch-item">Python 3<small>pandas / scikit-learn</small></div>
         <div class="arch-item">HTML5 / Chart.js<small>Frontend</small></div>
-        <div class="arch-item">GitHub Pages<small>Hosting — $0</small></div>
-        <div class="arch-item">QR Labels<small>Physical — $0.10 each</small></div>
+        <div class="arch-item">GitHub Pages<small>Hosting: $0</small></div>
+        <div class="arch-item">QR Labels<small>Physical: $0.10 each</small></div>
       </div>
     </div>
   </div>
@@ -605,7 +605,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 
 <!-- COMPARISON -->
 <section id="comparison">
-  <div class="section-label">05 — Data 1 vs Data 2 — Simulated Improvements</div>
+  <div class="section-label">05. Data 1 vs Data 2. Simulated Improvements</div>
   <h2 class="section-title">Every KPI target met. Availability more than doubled.</h2>
   <p class="section-body">Dataset 1 = current state (calibrated to BorrowBox statistics). Dataset 2 = post-QR state (calibrated to Canadian library case study benchmarks). Both contain 2,520 records.</p>
 
@@ -634,7 +634,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 
   <div class="kpi-compare-grid">
     <div class="kpi-compare-card reveal">
-      <div class="kpi-name">KPI 1 — Non-Return Rate</div>
+      <div class="kpi-name">KPI 1. Non-Return Rate</div>
       <div class="kpi-arrow-row">
         <span class="kpi-before">23.3%</span>
         <span class="kpi-arrow-sym">→</span>
@@ -644,17 +644,17 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
       <div class="kpi-desc">Patron accountability through QR-linked records plus automated alerts recovers items before they become permanent losses. Formula: (NR ÷ C) × 100</div>
     </div>
     <div class="kpi-compare-card reveal reveal-delay-1">
-      <div class="kpi-name">KPI 2 — Damage Rate on Return</div>
+      <div class="kpi-name">KPI 2. Damage Rate on Return</div>
       <div class="kpi-arrow-row">
         <span class="kpi-before">39.6%</span>
         <span class="kpi-arrow-sym">→</span>
         <span class="kpi-after">19.5%</span>
       </div>
       <span class="kpi-delta neg">−20.1 pp</span>
-      <div class="kpi-desc">Condition logging at every scan forces documentation. Patrons know returns are recorded — behaviour changes. Formula: (D ÷ R) × 100</div>
+      <div class="kpi-desc">Condition logging at every scan forces documentation. Patrons know returns are recorded; behaviour changes. Formula: (D ÷ R) × 100</div>
     </div>
     <div class="kpi-compare-card reveal reveal-delay-2">
-      <div class="kpi-name">KPI 3 — Inventory Availability</div>
+      <div class="kpi-name">KPI 3. Inventory Availability</div>
       <div class="kpi-arrow-row">
         <span class="kpi-before">46.3%</span>
         <span class="kpi-arrow-sym">→</span>
@@ -664,7 +664,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
       <div class="kpi-desc">The direct result of recovering non-returns and reducing damage. Good condition returns go straight back to Available. Formula: (A ÷ T) × 100</div>
     </div>
     <div class="kpi-compare-card reveal">
-      <div class="kpi-name">KPI 4 — Average Days Overdue</div>
+      <div class="kpi-name">KPI 4. Average Days Overdue</div>
       <div class="kpi-arrow-row">
         <span class="kpi-before">63.3d</span>
         <span class="kpi-arrow-sym">→</span>
@@ -674,7 +674,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
       <div class="kpi-desc">Entirely driven by KPI 6. When 81.4% of patrons respond within 48 hours, items come back fast. Formula: Σ(DOᵢ) ÷ N</div>
     </div>
     <div class="kpi-compare-card reveal reveal-delay-1">
-      <div class="kpi-name">KPI 5 — Annual Loss Cost</div>
+      <div class="kpi-name">KPI 5. Annual Loss Cost</div>
       <div class="kpi-arrow-row">
         <span class="kpi-before">$95K</span>
         <span class="kpi-arrow-sym">→</span>
@@ -684,14 +684,14 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
       <div class="kpi-desc">Fewer missing items means fewer replacements. QR labels cost under $0.10 each. System pays for itself within weeks. Formula: Σ(RCᵢ) for M∪WO</div>
     </div>
     <div class="kpi-compare-card reveal reveal-delay-2" style="border: 2px solid var(--ink);">
-      <div class="kpi-name">KPI 6 — Alert Response Rate <span style="background:var(--ink);color:#fff;font-size:.65rem;padding:.15rem .5rem;margin-left:.3rem;border-radius:2px;">NEW</span></div>
+      <div class="kpi-name">KPI 6. Alert Response Rate <span style="background:var(--ink);color:#fff;font-size:.65rem;padding:.15rem .5rem;margin-left:.3rem;border-radius:2px;">NEW</span></div>
       <div class="kpi-arrow-row">
         <span class="kpi-before" style="font-size:1.4rem;">No System</span>
         <span class="kpi-arrow-sym">→</span>
         <span class="kpi-after">81.4%</span>
       </div>
       <span class="kpi-delta new">Target exceeded (+1.4pp)</span>
-      <div class="kpi-desc">No baseline — no alert system existed before QR. 96 of 118 overdue alerts resulted in return within 48 hours. Formula: (AR ÷ AS) × 100</div>
+      <div class="kpi-desc">No baseline: no alert system existed before QR. 96 of 118 overdue alerts resulted in return within 48 hours. Formula: (AR ÷ AS) × 100</div>
     </div>
   </div>
 
@@ -709,21 +709,21 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
 
 <!-- CONCLUSION -->
 <section id="conclusion">
-  <div class="section-label">06 — Conclusion & Impact</div>
+  <div class="section-label">06. Conclusion & Impact</div>
   <h2 class="section-title">A $0 software cost that saves $77,000 a year.</h2>
 
   <div class="outcome-grid">
     <div class="outcome-item reveal">
       <h4>Primary Outcome</h4>
-      <p>Inventory availability rises from 46.3% to 76.7% — a 30 percentage point gain. More items available means more patrons served, which is the entire point of the program.</p>
+      <p>Inventory availability rises from 46.3% to 76.7%, a 30 percentage point gain. More items available means more patrons served, which is the entire point of the program.</p>
     </div>
     <div class="outcome-item reveal reveal-delay-1">
       <h4>Financial Impact</h4>
-      <p>Annual loss cost falls from $95,000 to $18,000 — an 81% reduction. QR label cost per item: under $0.10. Full system cost: $0 in software licensing. ROI is measured in weeks.</p>
+      <p>Annual loss cost falls from $95,000 to $18,000. an 81% reduction. QR label cost per item: under $0.10. Full system cost: $0 in software licensing. ROI is measured in weeks.</p>
     </div>
     <div class="outcome-item reveal reveal-delay-2">
       <h4>Scope Pivot</h4>
-      <p>Original scope: no-show prediction ML model (AUC 0.82 — target met). Redirected by Dr. Cardona in Week 6 to the more significant inventory loss problem. ML model retained as secondary deliverable.</p>
+      <p>Original scope: no-show prediction ML model (AUC 0.82. target met). Redirected by Dr. Cardona in Week 6 to the more significant inventory loss problem. ML model retained as secondary deliverable.</p>
     </div>
     <div class="outcome-item reveal reveal-delay-3">
       <h4>Academic Contribution</h4>
@@ -773,7 +773,7 @@ footer { background: #000; color: rgba(255,255,255,.25); text-align: center; pad
         <div class="team-role">Documentation</div>
       </div>
     </div>
-    <div class="advisor-bar">Advisor: <strong>Dr. Tatiana Cardona</strong> — Information Systems Department, Saint Louis University — IS 5960 Master Research Project — March 2026</div>
+    <div class="advisor-bar">Advisor: <strong>Dr. Tatiana Cardona</strong> | Information Systems Department, Saint Louis University | IS 5960 Master Research Project | March 2026</div>
   </div>
 </section>
 
